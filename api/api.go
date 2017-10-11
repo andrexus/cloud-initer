@@ -12,7 +12,6 @@ import (
 	"github.com/andrexus/cloud-initer/conf"
 	"github.com/andrexus/cloud-initer/model"
 	"github.com/boltdb/bolt"
-	"github.com/pborman/uuid"
 )
 
 // API is the data holder for the API
@@ -63,7 +62,7 @@ func NewAPI(config *conf.Configuration, db *bolt.DB) *API {
 	// add the endpoints
 	e := echo.New()
 	e.HideBanner = true
-	//e.Use(api.setupRequest)
+	e.Use(api.setupRequest)
 
 	g := e.Group("/api/v1")
 
@@ -74,6 +73,10 @@ func NewAPI(config *conf.Configuration, db *bolt.DB) *API {
 	g.PUT("/instances/:id", api.InstanceUpdate)
 	g.DELETE("/instances/:id", api.InstanceDelete)
 
+	// cloud-init
+	e.GET("/user-data", api.UserData, api.injectInstanceByIp)
+	e.GET("/meta-data", api.MetaData, api.injectInstanceByIp)
+
 	api.echo = e
 
 	return api
@@ -83,25 +86,15 @@ func (api *API) setupRequest(f echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		req := ctx.Request()
 		logger := api.log.WithFields(logrus.Fields{
-			"method":     req.Method,
-			"path":       req.URL.Path,
-			"request_id": uuid.NewRandom().String(),
+			"method": req.Method,
+			"path":   req.URL.Path,
 		})
 		ctx.Set(loggerKey, logger)
 
-		startTime := time.Now()
-		defer func() {
-			rsp := ctx.Response()
-			logger.WithFields(logrus.Fields{
-				"status_code":  rsp.Status,
-				"runtime_nano": time.Since(startTime).Nanoseconds(),
-			}).Info("Finished request")
-		}()
-
 		logger.WithFields(logrus.Fields{
-			"user_agent":     req.UserAgent(),
-			"content_length": req.ContentLength,
-		}).Info("Starting request")
+			"user_agent": req.UserAgent(),
+			"ip_address": ctx.RealIP(),
+		}).Info("Request")
 
 		// we have to do this b/c if not the final error handler will not
 		// in the chain of middleware. It will be called after meaning that the

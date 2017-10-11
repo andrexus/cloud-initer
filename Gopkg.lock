@@ -8,12 +8,6 @@
   version = "v0.11.5"
 
 [[projects]]
-  name = "github.com/asdine/storm"
-  packages = [".","codec","codec/json","index","internal","q"]
-  revision = "255212403bcca439778718edf5e2d3d50744eca3"
-  version = "v1.1.0"
-
-[[projects]]
   name = "github.com/boltdb/bolt"
   packages = ["."]
   revision = "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8"
@@ -80,12 +74,6 @@
   revision = "d0303fe809921458f417bcf828397a65db30a7e4"
 
 [[projects]]
-  name = "github.com/pborman/uuid"
-  packages = ["."]
-  revision = "e790cca94e6cc75c7064b1332e63811d4aae1a53"
-  version = "v1.1"
-
-[[projects]]
   name = "github.com/pelletier/go-toml"
   packages = ["."]
   revision = "16398bac157da96aa88f98a2df640c7f32af1da2"
@@ -119,7 +107,7 @@
   branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "4d6af280c76ff7d266434f2dba207c4b75dfc076"
+  revision = "40f18800b20df8f74ad2b02aa4e56748a3d17239"
 
 [[projects]]
   branch = "master"
@@ -184,7 +172,7 @@
 [[projects]]
   branch = "v2"
   name = "gopkg.in/mgo.v2"
-  packages = [".","bson","internal/json","internal/sasl","internal/scram"]
+  packages = ["bson","internal/json"]
   revision = "3f83fa5005286a7fe593b055f0d7771a7dce4655"
 
 [[projects]]
@@ -196,6 +184,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "207c6156f78db67db39623f2f8b8eadd0b22fa9e118cf367b5377e2a7ee2554b"
+  inputs-digest = "75145541d26d67f471eea95b1fddec2c5d1280539755114efb57cb91b489fda4"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -28,7 +28,7 @@ func (api *API) InstanceCreate(ctx echo.Context) error {
 	item, err := api.instances.Create(item)
 	if err != nil {
 		response := &APIResponse{Message: err.Error()}
-		return ctx.JSON(http.StatusInternalServerError, response)
+		return ctx.JSON(http.StatusBadRequest, response)
 	}
 	return ctx.JSON(http.StatusCreated, item)
 
@@ -69,7 +69,7 @@ func (api *API) InstanceUpdate(ctx echo.Context) error {
 	item, err = api.instances.Update(item, newItem)
 	if err != nil {
 		response := &APIResponse{Message: err.Error()}
-		return ctx.JSON(http.StatusInternalServerError, response)
+		return ctx.JSON(http.StatusBadRequest, response)
 	}
 	return ctx.JSON(http.StatusOK, item)
 

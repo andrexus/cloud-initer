@@ -45,6 +45,7 @@ func (e FieldRequiredValidationError) Error() string {
 type InstanceService interface {
 	FindAll() ([]Instance, error)
 	FindOne(id string) (*Instance, error)
+	FindByIP(ipAddress string) (*Instance, error)
 	Create(item *Instance) (*Instance, error)
 	Update(item *Instance, newItem *Instance) (*Instance, error)
 	Delete(id string) error
@@ -66,6 +67,10 @@ func (c *InstanceServiceImpl) FindAll() ([]Instance, error) {
 
 func (c *InstanceServiceImpl) FindOne(id string) (*Instance, error) {
 	return c.Repository.FindOne(id)
+}
+
+func (c *InstanceServiceImpl) FindByIP(ipAddress string) (*Instance, error) {
+	return c.Repository.FindByIPAddress(ipAddress)
 }
 
 func (c *InstanceServiceImpl) Create(item *Instance) (*Instance, error) {
