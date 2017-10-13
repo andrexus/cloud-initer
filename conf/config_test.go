@@ -11,11 +11,9 @@ import (
 
 func TestConfigWithOverrides(t *testing.T) {
 	original := Configuration{}
-	original.JWT.Secret = "jwt-secret"
-	original.DB.Name = "db-name"
-	original.DB.ConnURL = "conn-url"
+	original.DB.Path = "db.bolt"
 	original.API.Host = "api-host"
-	original.API.Port = 12356
+	original.API.Port = 8000
 
 	tmpfile, err := ioutil.TempFile("", "gs-test")
 	assert.Nil(t, err)
@@ -32,20 +30,20 @@ func TestConfigWithOverrides(t *testing.T) {
 	assert.Nil(t, err)
 
 	// override some values
-	os.Setenv("GS_GEO_JWT_SECRET", "env-jwt-secret")
-	os.Setenv("GS_GEO_DB_NAME", "env-db-name")
-	os.Setenv("GS_GEO_API_PORT", "456456")
+	os.Setenv("CLOUD_INITER_DB_PATH", "db.bolt")
+	os.Setenv("CLOUD_INITER_API_HOST", "api-host")
+	os.Setenv("CLOUD_INITER_API_PORT", "8000")
 
 	config, err := Load(fname)
 	assert.Nil(t, err)
 	assert.NotNil(t, config)
 
 	// check we loaded from the file
-	assert.Equal(t, config.DB.ConnURL, original.DB.ConnURL)
+	assert.Equal(t, config.DB.Path, original.DB.Path)
 	assert.Equal(t, config.API.Host, original.API.Host)
 
 	// check we got the overrides
-	assert.Equal(t, "env-jwt-secret", config.JWT.Secret)
-	assert.Equal(t, "env-db-name", config.DB.Name)
-	assert.EqualValues(t, 456456, config.API.Port)
+	assert.Equal(t, "db.bolt", config.DB.Path)
+	assert.EqualValues(t, "api-host", config.API.Host)
+	assert.EqualValues(t, 8000, config.API.Port)
 }
