@@ -10,6 +10,7 @@ import (
 
 type Instance struct {
 	ID         bson.ObjectId `json:"id"`
+	Name       string        `json:"name"`
 	IPAddress  string        `json:"ipAddress"`
 	MACAddress string        `json:"macAddress"`
 	MetaData   string        `json:"metaData"`
@@ -86,6 +87,7 @@ func (c *InstanceServiceImpl) Update(item *Instance, newItem *Instance) (*Instan
 	if err := c.validatePayload(newItem); err != nil {
 		return nil, err
 	}
+	item.Name = newItem.Name
 	item.IPAddress = newItem.IPAddress
 	item.MACAddress = newItem.MACAddress
 	item.MetaData = newItem.MetaData
