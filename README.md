@@ -3,9 +3,11 @@ Manage and serve cloud-init’s meta-data and user-data.
 
 Download release binary or build it locally.
 Then run with the following command:
+
 ```
 ./cloud-initer --config config.json 
 ```
+You can find default config in the root of this repository (config.default.json)
 
 ## Licence
 
