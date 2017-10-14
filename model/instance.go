@@ -110,14 +110,14 @@ func (c *InstanceServiceImpl) validatePayload(item *Instance) error {
 	if err != nil {
 		return err
 	}
-	if existingItem != nil {
+	if existingItem != nil && existingItem.ID != item.ID {
 		return &IPAddressValidationError{item.IPAddress}
 	}
 	existingItem, err = c.Repository.FindByMACAddress(item.MACAddress)
 	if err != nil {
 		return err
 	}
-	if existingItem != nil {
+	if existingItem != nil && existingItem.ID != item.ID {
 		return &MACAddressValidationError{item.MACAddress}
 	}
 	return nil
