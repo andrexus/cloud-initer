@@ -3,9 +3,7 @@ go:
   - tip
 env:
   - "PATH=/home/travis/gopath/bin:$PATH"
+
 before_install:
-  - go get github.com/mitchellh/gox
-  - go get github.com/tcnksm/ghr
-after_success:
-  - gox -osarch="darwin/amd64 linux/386 linux/amd64 linux/arm" -output "dist/{{.OS}}_{{.Arch}}_{{.Dir}}"
-  - ghr -u andrexus --token $GITHUB_TOKEN --replace --prerelease $(git describe --abbrev=0 --tags) dist/
+  - curl -o build-prod.tar.gz -L https://github.com/andrexus/cloud-initer-frontend/releases/download/v0.1.0/build-prod.tar.gz
+  - tar xzf build-prod.tar.gz
