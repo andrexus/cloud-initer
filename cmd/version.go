@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var Version string = "0.1.1"
+var Version string = "unset"
 
 var versionCmd = cobra.Command{
 	Run: showVersion,
