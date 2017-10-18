@@ -20,6 +20,7 @@ export GOLDFLAGS
 all: bin dist
 
 bin: tools
+	dep ensure
 	go generate
 	@echo "==> Building..."
 	gox -ldflags "${GOLDFLAGS}" -osarch "darwin/amd64 linux/386 linux/amd64 linux/arm" -output "build/{{.OS}}_{{.Arch}}_{{.Dir}}"
