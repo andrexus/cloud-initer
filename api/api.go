@@ -9,7 +9,13 @@ import (
 
 	"context"
 
+	"net/http"
+
+	"bytes"
+	"io"
+
 	"github.com/andrexus/cloud-initer/conf"
+	"github.com/andrexus/cloud-initer/generated"
 	"github.com/andrexus/cloud-initer/model"
 	"github.com/boltdb/bolt"
 )
@@ -62,7 +68,7 @@ func NewAPI(config *conf.Configuration, db *bolt.DB) *API {
 	// add the endpoints
 	e := echo.New()
 	e.HideBanner = true
-	e.Use(api.setupRequest)
+	//e.Use(api.logRequest)
 
 	g := e.Group("/api/v1")
 
@@ -74,15 +80,47 @@ func NewAPI(config *conf.Configuration, db *bolt.DB) *API {
 	g.DELETE("/instances/:id", api.InstanceDelete)
 
 	// cloud-init
-	e.GET("/user-data", api.UserData, api.injectInstanceByIp)
-	e.GET("/meta-data", api.MetaData, api.injectInstanceByIp)
+	e.GET("/user-data", api.UserData, api.logRequest, api.injectInstanceByIp)
+	e.GET("/meta-data", api.MetaData, api.logRequest, api.injectInstanceByIp)
+
+	e.GET("/*", api.serveVirtualFS, api.angularRouterFallback)
 
 	api.echo = e
 
 	return api
 }
 
-func (api *API) setupRequest(f echo.HandlerFunc) echo.HandlerFunc {
+func (api *API) serveVirtualFS(ctx echo.Context) error {
+	w, r := ctx.Response(), ctx.Request()
+	fileSystem := generated.FS(false)
+	_, err := fileSystem.Open(r.URL.Path)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+	fileServer := http.FileServer(fileSystem)
+	fileServer.ServeHTTP(w, r)
+	return nil
+}
+
+func (api *API) angularRouterFallback(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		err := next(c)
+		if err != nil {
+			e, ok := err.(*echo.HTTPError)
+			if ok && e.Code == http.StatusNotFound {
+				fileSystem := generated.FS(false)
+				f, _ := fileSystem.Open("/index.html")
+				buf := bytes.NewBuffer(nil)
+				io.Copy(buf, f)
+				f.Close()
+				c.HTML(http.StatusOK, string(buf.Bytes()))
+			}
+		}
+		return err
+	}
+}
+
+func (api *API) logRequest(f echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		req := ctx.Request()
 		logger := api.log.WithFields(logrus.Fields{
@@ -96,9 +134,6 @@ func (api *API) setupRequest(f echo.HandlerFunc) echo.HandlerFunc {
 			"ip_address": ctx.RealIP(),
 		}).Info("Request")
 
-		// we have to do this b/c if not the final error handler will not
-		// in the chain of middleware. It will be called after meaning that the
-		// response won't be set properly.
 		err := f(ctx)
 		if err != nil {
 			ctx.Error(err)

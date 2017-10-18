@@ -1,5 +1,8 @@
 package main
 
+//go:generate mkdir -p generated
+//go:generate esc -o generated/assets.go -pkg generated -prefix "dist/" dist
+
 import (
 	"fmt"
 	"os"
