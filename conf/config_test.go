@@ -15,7 +15,7 @@ func TestConfigWithOverrides(t *testing.T) {
 	original.API.Host = "api-host"
 	original.API.Port = 8000
 
-	tmpfile, err := ioutil.TempFile("", "gs-test")
+	tmpfile, err := ioutil.TempFile("", "cloud-initer")
 	assert.Nil(t, err)
 
 	fname := tmpfile.Name() + ".json"

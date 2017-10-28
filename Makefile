@@ -1,5 +1,6 @@
 SHELL = bash
 GOTOOLS = \
+	github.com/alvaroloes/enumer \
 	github.com/mjibson/esc \
 	github.com/mitchellh/gox \
 	github.com/tcnksm/ghr

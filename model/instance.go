@@ -5,14 +5,15 @@ import (
 
 	"fmt"
 
+	"gopkg.in/go-playground/validator.v9"
 	"gopkg.in/mgo.v2/bson"
 )
 
 type Instance struct {
 	ID         bson.ObjectId `json:"id"`
-	Name       string        `json:"name"`
-	IPAddress  string        `json:"ipAddress"`
-	MACAddress string        `json:"macAddress"`
+	Name       string        `json:"name" validate:"required"`
+	IPAddress  string        `json:"ipAddress" validate:"required,ip,uniqueIP"`
+	MACAddress string        `json:"macAddress" validate:"required,mac,uniqueMAC"`
 	MetaData   string        `json:"metaData"`
 	UserData   string        `json:"userData"`
 	CreatedAt  time.Time     `json:"createdAt"`
@@ -56,10 +57,13 @@ type InstanceServiceImpl struct {
 	Repository InstanceRepository
 }
 
-func NewInstanceService(repository InstanceRepository) *InstanceServiceImpl {
-	return &InstanceServiceImpl{
+func NewInstanceService(repository InstanceRepository, validator *validator.Validate) *InstanceServiceImpl {
+	service := &InstanceServiceImpl{
 		Repository: repository,
 	}
+	validator.RegisterValidation("uniqueIP", service.validateUniqueIP)
+	validator.RegisterValidation("uniqueMAC", service.validateUniqueMAC)
+	return service
 }
 
 func (c *InstanceServiceImpl) FindAll() ([]Instance, error) {
@@ -75,18 +79,11 @@ func (c *InstanceServiceImpl) FindByIP(ipAddress string) (*Instance, error) {
 }
 
 func (c *InstanceServiceImpl) Create(item *Instance) (*Instance, error) {
-	if err := c.validatePayload(item); err != nil {
-		return nil, err
-	}
-
 	item.ID = ""
 	return c.Repository.Save(item)
 }
 
 func (c *InstanceServiceImpl) Update(item *Instance, newItem *Instance) (*Instance, error) {
-	if err := c.validatePayload(newItem); err != nil {
-		return nil, err
-	}
 	item.Name = newItem.Name
 	item.IPAddress = newItem.IPAddress
 	item.MACAddress = newItem.MACAddress
@@ -99,26 +96,26 @@ func (c *InstanceServiceImpl) Delete(id string) error {
 	return c.Repository.Delete(id)
 }
 
-func (c *InstanceServiceImpl) validatePayload(item *Instance) error {
-	if item.IPAddress == "" {
-		return &FieldRequiredValidationError{"ipAddress"}
-	}
-	if item.MACAddress == "" {
-		return &FieldRequiredValidationError{"macAddress"}
-	}
+func (c *InstanceServiceImpl) validateUniqueIP(fl validator.FieldLevel) bool {
+	item := fl.Parent().Interface().(*Instance)
 	existingItem, err := c.Repository.FindByIPAddress(item.IPAddress)
 	if err != nil {
-		return err
+		return false
 	}
 	if existingItem != nil && existingItem.ID != item.ID {
-		return &IPAddressValidationError{item.IPAddress}
+		return false
 	}
-	existingItem, err = c.Repository.FindByMACAddress(item.MACAddress)
+	return true
+}
+
+func (c *InstanceServiceImpl) validateUniqueMAC(fl validator.FieldLevel) bool {
+	item := fl.Parent().Interface().(*Instance)
+	existingItem, err := c.Repository.FindByMACAddress(item.MACAddress)
 	if err != nil {
-		return err
+		return false
 	}
 	if existingItem != nil && existingItem.ID != item.ID {
-		return &MACAddressValidationError{item.MACAddress}
+		return false
 	}
-	return nil
+	return true
 }

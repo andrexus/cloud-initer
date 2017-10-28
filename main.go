@@ -1,7 +1,8 @@
 package main
 
-//go:generate mkdir -p generated
-//go:generate esc -o generated/assets.go -pkg generated -prefix "dist/" dist
+//go:generate enumer -type=APIResponseStatus -json enums
+//go:generate mkdir -p embedded
+//go:generate esc -o embedded/assets.go -pkg embedded -prefix "dist/" dist
 
 import (
 	"fmt"
