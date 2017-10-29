@@ -3,8 +3,6 @@ package model
 import (
 	"time"
 
-	"fmt"
-
 	"gopkg.in/go-playground/validator.v9"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -18,30 +16,6 @@ type Instance struct {
 	UserData   string        `json:"userData"`
 	CreatedAt  time.Time     `json:"createdAt"`
 	UpdatedAt  time.Time     `json:"updatedAt"`
-}
-
-type IPAddressValidationError struct {
-	IPAddress string
-}
-
-func (e IPAddressValidationError) Error() string {
-	return fmt.Sprintf("Instance with IP address %s already exists", e.IPAddress)
-}
-
-type MACAddressValidationError struct {
-	MACAddress string
-}
-
-func (e MACAddressValidationError) Error() string {
-	return fmt.Sprintf("Instance with MAC address %s already exists", e.MACAddress)
-}
-
-type FieldRequiredValidationError struct {
-	FieldName string
-}
-
-func (e FieldRequiredValidationError) Error() string {
-	return fmt.Sprintf("%s is required", e.FieldName)
 }
 
 type InstanceService interface {
