@@ -8,6 +8,12 @@
   version = "v0.11.5"
 
 [[projects]]
+  name = "github.com/aymerick/raymond"
+  packages = [".","ast","lexer","parser"]
+  revision = "a2232af10b53ef1ae5a767f5178db3a6c1dab655"
+  version = "v2.0.1"
+
+[[projects]]
   name = "github.com/boltdb/bolt"
   packages = ["."]
   revision = "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8"
@@ -107,7 +113,7 @@
   branch = "master"
   name = "github.com/spf13/afero"
   packages = [".","mem"]
-  revision = "e67d870304c4bca21331b02f414f970df13aa694"
+  revision = "5660eeed305fe5f69c8fc6cf899132a459a97064"
 
 [[projects]]
   name = "github.com/spf13/cast"
@@ -116,10 +122,10 @@
   version = "v1.1.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/spf13/cobra"
   packages = ["."]
   revision = "7b2c5ac9fc04fc5efafb60700713d4fa609b777b"
+  version = "v0.0.1"
 
 [[projects]]
   branch = "master"
@@ -167,19 +173,19 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["acme","acme/autocert"]
-  revision = "9419663f5a44be8b34ca85f08abc5fe1be11f8a3"
+  revision = "2509b142fb2b797aa7587dad548f113b2c0f20ce"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "8dbc5d05d6edcc104950cc299a1ce6641235bc86"
+  revision = "661970f62f5897bc0cd5fdca7e087ba8a98a8fa1"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/text"
   packages = ["internal/gen","internal/triegen","internal/ucd","transform","unicode/cldr","unicode/norm"]
-  revision = "c01e4764d870b77f8abe5096ee19ad20d80e8075"
+  revision = "6eab0e8f74e86c598ec3b6fad4888e0c11482d48"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v9"
@@ -202,6 +208,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "49adbc9d3e7343342c746ec641cee51333faf0fb501d0de9c347694f150c59e8"
+  inputs-digest = "002458f307cb53011deb1bc9cb5d7ea6a1f372df0e9518d45c44366ebc961f94"
   solver-name = "gps-cdcl"
   solver-version = 1

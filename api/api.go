@@ -19,10 +19,10 @@ import (
 
 	"github.com/andrexus/cloud-initer/conf"
 	"github.com/andrexus/cloud-initer/embedded"
+	"github.com/andrexus/cloud-initer/enums"
 	"github.com/andrexus/cloud-initer/model"
 	"github.com/boltdb/bolt"
 	"gopkg.in/go-playground/validator.v9"
-	"github.com/andrexus/cloud-initer/enums"
 )
 
 // API is the data holder for the API
@@ -33,7 +33,7 @@ type API struct {
 	echo   *echo.Echo
 
 	// Services used by the API
-	instances model.InstanceService
+	instances   model.InstanceService
 	environment model.EnvironmentService
 
 	validator CustomValidator
@@ -48,8 +48,8 @@ type APIListResponse struct {
 
 type APIResponse struct {
 	Status  enums.APIResponseStatus `json:"status"`
-	Message string                      `json:"message"`
-	Errors  []ErrorResponseItem         `json:"errors,omitempty"`
+	Message string                  `json:"message"`
+	Errors  []ErrorResponseItem     `json:"errors,omitempty"`
 }
 
 type ErrorResponseItem struct {
@@ -65,7 +65,7 @@ func NewAPIResponseFromValidationError(errors validator.ValidationErrors) *APIRe
 		switch err.Tag() {
 		case "required":
 			message = fmt.Sprintf("%s is required", err.Field())
-        case "json":
+		case "json":
 			message = fmt.Sprintf("%s is not a valid JSON", err.Field())
 		case "ip":
 			message = fmt.Sprintf("%s is wrong", err.Field())
@@ -111,8 +111,8 @@ func NewAPI(config *conf.Configuration, db *bolt.DB) *API {
 	}
 
 	apiValidator := createValidator()
-	api.instances = model.NewInstanceService(model.NewInstanceRepository(db), apiValidator.validator)
 	api.environment = model.NewEnvironmentService(model.NewEnvironmentRepository(db), apiValidator.validator)
+	api.instances = model.NewInstanceService(model.NewInstanceRepository(db), api.environment, apiValidator.validator)
 
 	// add the endpoints
 	e := echo.New()
@@ -128,6 +128,7 @@ func NewAPI(config *conf.Configuration, db *bolt.DB) *API {
 	g.GET("/instances/:id", api.InstanceGet)
 	g.PUT("/instances/:id", api.InstanceUpdate)
 	g.DELETE("/instances/:id", api.InstanceDelete)
+	g.GET("/instances/:id/preview", api.InstancePreview)
 
 	// Environment
 	g.GET("/environment", api.EnvironmentGet)

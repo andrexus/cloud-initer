@@ -10,6 +10,10 @@
   name = "gopkg.in/go-playground/validator.v9"
 
 [[constraint]]
+  name = "github.com/aymerick/raymond"
+  version = "2.0.1"
+
+[[constraint]]
   name = "github.com/Sirupsen/logrus"
   version = "0.11.5"
 
