@@ -34,6 +34,8 @@ type API struct {
 
 	// Services used by the API
 	instances model.InstanceService
+	environment model.EnvironmentService
+
 	validator CustomValidator
 }
 
@@ -63,6 +65,8 @@ func NewAPIResponseFromValidationError(errors validator.ValidationErrors) *APIRe
 		switch err.Tag() {
 		case "required":
 			message = fmt.Sprintf("%s is required", err.Field())
+        case "json":
+			message = fmt.Sprintf("%s is not a valid JSON", err.Field())
 		case "ip":
 			message = fmt.Sprintf("%s is wrong", err.Field())
 		case "mac":
@@ -108,6 +112,7 @@ func NewAPI(config *conf.Configuration, db *bolt.DB) *API {
 
 	apiValidator := createValidator()
 	api.instances = model.NewInstanceService(model.NewInstanceRepository(db), apiValidator.validator)
+	api.environment = model.NewEnvironmentService(model.NewEnvironmentRepository(db), apiValidator.validator)
 
 	// add the endpoints
 	e := echo.New()
@@ -123,6 +128,10 @@ func NewAPI(config *conf.Configuration, db *bolt.DB) *API {
 	g.GET("/instances/:id", api.InstanceGet)
 	g.PUT("/instances/:id", api.InstanceUpdate)
 	g.DELETE("/instances/:id", api.InstanceDelete)
+
+	// Environment
+	g.GET("/environment", api.EnvironmentGet)
+	g.PUT("/environment", api.EnvironmentUpdate)
 
 	// cloud-init
 	e.GET("/user-data", api.UserData, api.logRequest, api.injectInstanceByIp)
