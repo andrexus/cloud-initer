@@ -35,6 +35,7 @@ type API struct {
 	// Services used by the API
 	instances   model.InstanceService
 	environment model.EnvironmentService
+	cloudInit model.CloudInitService
 
 	validator CustomValidator
 }
@@ -112,7 +113,8 @@ func NewAPI(config *conf.Configuration, db *bolt.DB) *API {
 
 	apiValidator := createValidator()
 	api.environment = model.NewEnvironmentService(model.NewEnvironmentRepository(db), apiValidator.validator)
-	api.instances = model.NewInstanceService(model.NewInstanceRepository(db), api.environment, apiValidator.validator)
+	api.instances = model.NewInstanceService(model.NewInstanceRepository(db), apiValidator.validator)
+	api.cloudInit = model.NewCloudInitService(api.instances, api.environment)
 
 	// add the endpoints
 	e := echo.New()
@@ -128,13 +130,13 @@ func NewAPI(config *conf.Configuration, db *bolt.DB) *API {
 	g.GET("/instances/:id", api.InstanceGet)
 	g.PUT("/instances/:id", api.InstanceUpdate)
 	g.DELETE("/instances/:id", api.InstanceDelete)
-	g.GET("/instances/:id/preview", api.InstancePreview)
 
 	// Environment
 	g.GET("/environment", api.EnvironmentGet)
 	g.PUT("/environment", api.EnvironmentUpdate)
 
 	// cloud-init
+	g.POST("/preview", api.Preview)
 	e.GET("/user-data", api.UserData, api.logRequest, api.injectInstanceByIp)
 	e.GET("/meta-data", api.MetaData, api.logRequest, api.injectInstanceByIp)
 

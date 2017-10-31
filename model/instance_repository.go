@@ -115,7 +115,6 @@ func (r *BoltInstanceRepository) Save(item *Instance) (*Instance, error) {
 			}
 			return b.Put([]byte(item.ID.Hex()), enc)
 		} else {
-			item.UpdatedAt = time.Now()
 			enc, err := item.encode()
 			if err != nil {
 				return err
