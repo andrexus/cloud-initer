@@ -6,7 +6,6 @@ import (
 	"github.com/andrexus/cloud-initer/model"
 	"github.com/labstack/echo"
 	"gopkg.in/go-playground/validator.v9"
-	"time"
 )
 
 func (api *API) InstanceList(ctx echo.Context) error {
@@ -62,20 +61,10 @@ func (api *API) InstanceUpdate(ctx echo.Context) error {
 		response := &APIResponse{Message: err.Error()}
 		return ctx.JSON(http.StatusInternalServerError, response)
 	}
-	item, err := api.instances.FindOne(id)
-	if err != nil {
-		response := &APIResponse{Message: err.Error()}
-		return ctx.JSON(http.StatusInternalServerError, response)
-	}
-	if item == nil {
-		response := &APIResponse{Message: "instance not found"}
-		return ctx.JSON(http.StatusNotFound, response)
-	}
 	if err := ctx.Validate(newItem); err != nil {
 		return ctx.JSON(http.StatusBadRequest, NewAPIResponseFromValidationError(err.(validator.ValidationErrors)))
 	}
-	newItem.UpdatedAt = time.Now()
-	item, err = api.instances.Update(item, newItem)
+	item, err := api.instances.Update(id, newItem)
 	if err != nil {
 		response := &APIResponse{Message: err.Error()}
 		return ctx.JSON(http.StatusInternalServerError, response)
@@ -86,16 +75,7 @@ func (api *API) InstanceUpdate(ctx echo.Context) error {
 
 func (api *API) InstanceDelete(ctx echo.Context) error {
 	id := ctx.Param("id")
-	item, err := api.instances.FindOne(id)
-	if err != nil {
-		response := &APIResponse{Message: err.Error()}
-		return ctx.JSON(http.StatusInternalServerError, response)
-	}
-	if item == nil {
-		response := &APIResponse{Message: "instance not found"}
-		return ctx.JSON(http.StatusNotFound, response)
-	}
-	err = api.instances.Delete(id)
+	err := api.instances.Delete(id)
 	if err != nil {
 		response := &APIResponse{Message: err.Error()}
 		return ctx.JSON(http.StatusInternalServerError, response)

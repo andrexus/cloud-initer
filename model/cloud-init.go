@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/aymerick/raymond"
-	"time"
 )
 
 type CloudInitData struct {
@@ -35,22 +34,14 @@ func (c *CloudInitServiceImpl) PreviewCloudInitData(userDataTemplate, metaDataTe
 }
 
 func (c *CloudInitServiceImpl) GetCloudInitDataForClient(ipAddress, userAgent string) (*CloudInitData, error) {
-	item, err := c.InstanceService.FindByIP(ipAddress)
+	item, err := c.InstanceService.FindByIPForUserAgent(ipAddress, userAgent)
 	if err != nil {
 		return nil, err
 	}
 	if item == nil {
 		return nil, errors.New("no instance")
 	}
-	cloudInitData, err := c.newCloudInitDataFromTemplate(item.UserData, item.MetaData)
-	if err != nil {
-		return nil, err
-	}
-	item.RequestedAt = time.Now()
-	item.RequestedBy = userAgent
-	c.InstanceService.Update(item, item)
-
-	return cloudInitData, nil
+	return c.newCloudInitDataFromTemplate(item.UserData, item.MetaData)
 }
 
 func (c *CloudInitServiceImpl) newCloudInitDataFromTemplate(userDataTemplate, metaDataTemplate string) (*CloudInitData, error) {
