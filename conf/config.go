@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Config the application's configuration
 type Config struct {
 	API struct {
 		Host string `mapstructure:"host" json:"host"`
