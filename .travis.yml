@@ -4,10 +4,11 @@ go:
   - tip
 
 env:
-  - "PATH=/home/travis/gopath/bin:$PATH"
+  global:
+    - "PATH=/home/travis/gopath/bin:$PATH"
+    - FRONTEND_VERSION="0.1.3"
 
 script:
-  - FRONTEND_VERSION=0.1.3 curl -o build-prod.tar.gz -L \
-      https://github.com/andrexus/cloud-initer-frontend/releases/download/v$FRONTEND_VERSION/build-prod.tar.gz
+  - curl -o build-prod.tar.gz -L "https://github.com/andrexus/cloud-initer-frontend/releases/download/v${FRONTEND_VERSION}/build-prod.tar.gz"
   - tar xzf build-prod.tar.gz
   - make test build dist
