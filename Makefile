@@ -1,35 +1,58 @@
-SHELL = bash
-GOTOOLS = \
-	github.com/alvaroloes/enumer \
-	github.com/mjibson/esc \
-	github.com/mitchellh/gox \
-	github.com/tcnksm/ghr
-
-GOOS=$(shell go env GOOS)
-GOARCH=$(shell go env GOARCH)
-
-# Get the git commit
-GIT_LATEST_TAG=$(shell git describe --abbrev=0 --tags)
-VERSION_IMPORT=github.com/andrexus/cloud-initer/cmd
-GOLDFLAGS=-X $(VERSION_IMPORT).Version=$(GIT_LATEST_TAG)
-OSARCH=darwin/amd64 linux/386 linux/amd64 linux/arm windows/386 windows/amd64
+PROJECT_NAME?=cloud-initer
+PROJECT_NAMESPACE?=andrexus
+PROJECT?=github.com/${PROJECT_NAMESPACE}/${PROJECT_NAME}
+BUILD_DIR=build
+BUILDTAGS=
+GIT_VERSION=$(shell git describe --abbrev=0 --tags 2> /dev/null || git rev-parse HEAD)
+GOLDFLAGS=-s -w -X $(PROJECT)/cmd.Version=$(GIT_VERSION)
+OSARCH=darwin/amd64 linux/amd64 linux/arm windows/amd64
 DIST_USER=andrexus
+GOTOOLS = \
+    github.com/golang/dep/cmd/dep \
+    github.com/golang/lint/golint \
+	github.com/alvaroloes/enumer \
+    github.com/mjibson/esc \
+    github.com/mitchellh/gox \
+    github.com/tcnksm/ghr
 
-export GOLDFLAGS
+all: build dist
 
-# all builds binaries for all targets
-all: bin dist
-
-bin: tools
-	dep ensure
-	go generate
-	@echo "==> Building..."
-	gox -ldflags "${GOLDFLAGS}" -osarch "darwin/amd64 linux/386 linux/amd64 linux/arm" -output "build/{{.OS}}_{{.Arch}}_{{.Dir}}"
+build: vendor
+	@echo "==> Building ${PROJECT_NAME}..."
+	CGO_ENABLED=0 gox -ldflags "${GOLDFLAGS}" -osarch "${OSARCH}" -output "${BUILD_DIR}/{{.OS}}_{{.Arch}}_{{.Dir}}"
 
 dist:
-	ghr -u ${DIST_USER} --token ${GITHUB_TOKEN} --replace ${GIT_LATEST_TAG} build/
+	ghr -u ${DIST_USER} --token ${GITHUB_TOKEN} --replace ${GIT_VERSION} build/
+
+vendor: clean tools
+	@echo "==> Vendoring dependencies..."
+	dep ensure
+
+fmt:
+	@echo "+ $@"
+	@go list -f '{{if len .TestGoFiles}}"gofmt -s -l {{.Dir}}"{{end}}' $(shell go list ${PROJECT}/... | grep -v vendor) | xargs -r -L 1 sh -c
+
+lint:
+	@echo "+ $@"
+	@go list -f '{{if len .TestGoFiles}}"golint {{.Dir}}/..."{{end}}' $(shell go list ${PROJECT}/... | grep -v vendor) | xargs -r -L 1 sh -c
+
+vet:
+	@echo "+ $@"
+	@go vet $(shell go list ${PROJECT}/... | grep -v vendor)
+
+test: vendor fmt lint vet
+	@echo "+ $@"
+	@go test -v -race -tags "$(BUILDTAGS) cgo" $(shell go list ${PROJECT}/... | grep -v vendor)
+
+cover:
+	@echo "+ $@"
+	@go list -f '{{if len .TestGoFiles}}"go test -coverprofile={{.Dir}}/.coverprofile {{.ImportPath}}"{{end}}' $(shell go list ${PROJECT}/... | grep -v vendor) | xargs -r -L 1 sh -c
 
 tools:
-	go get -u -v $(GOTOOLS)
+	go get -u $(GOTOOLS)
 
-.PHONY: all bin dist tools
+generate: tools
+	go generate
+
+clean:
+	rm -rf ${BUILD_DIR}/*

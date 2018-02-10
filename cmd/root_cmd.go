@@ -21,7 +21,7 @@ func RootCmd() *cobra.Command {
 	return &rootCmd
 }
 
-func execWithConfig(cmd *cobra.Command, fn func(config *conf.Configuration)) {
+func execWithConfig(cmd *cobra.Command, fn func(config *conf.Config)) {
 	configFile, err := cmd.Flags().GetString("config")
 	if err != nil {
 		logrus.Fatalf("%+v", err)

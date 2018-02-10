@@ -3,12 +3,13 @@ package conf
 import (
 	"log"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/boltdb/bolt"
 	"github.com/xlab/closer"
-	"github.com/Sirupsen/logrus"
 )
 
-func BoltConnect(config *Configuration) (*bolt.DB, error) {
+// BoltConnect opens bolt database
+func BoltConnect(config *Config) (*bolt.DB, error) {
 
 	db, err := bolt.Open(config.DB.Path, 0600, nil)
 	if err != nil {
@@ -19,7 +20,6 @@ func BoltConnect(config *Configuration) (*bolt.DB, error) {
 		logrus.Info("Closing database file")
 		db.Close()
 	})
-
 
 	return db, nil
 }

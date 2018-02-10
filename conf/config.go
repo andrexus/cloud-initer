@@ -13,15 +13,14 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Configuration struct {
+type Config struct {
 	API struct {
 		Host string `mapstructure:"host" json:"host"`
 		Port int    `mapstructure:"port" json:"port"`
 	} `mapstructure:"api" json:"api"`
 
 	DB struct {
-		Path    string `mapstructure:"path" json:"path"`
-
+		Path string `mapstructure:"path" json:"path"`
 	} `mapstructure:"db" json:"db"`
 
 	LogConf struct {
@@ -31,7 +30,7 @@ type Configuration struct {
 }
 
 // Load will construct the config from the file
-func Load(configFile string) (*Configuration, error) {
+func Load(configFile string) (*Config, error) {
 	viper.SetConfigType("json")
 
 	if configFile != "" {
@@ -49,14 +48,9 @@ func Load(configFile string) (*Configuration, error) {
 		return nil, errors.Wrap(err, "reading configuration from files")
 	}
 
-	config := new(Configuration)
+	config := new(Config)
 	if err := viper.Unmarshal(config); err != nil {
 		return nil, errors.Wrap(err, "unmarshaling configuration")
-	}
-
-	config, err := populateConfig(config)
-	if err != nil {
-		return nil, errors.Wrap(err, "populate config")
 	}
 
 	if err := configureLogging(config); err != nil {
@@ -66,7 +60,7 @@ func Load(configFile string) (*Configuration, error) {
 	return validateConfig(config)
 }
 
-func configureLogging(config *Configuration) error {
+func configureLogging(config *Config) error {
 	// always use the full timestamp
 	logrus.SetFormatter(&logrus.TextFormatter{
 		FullTimestamp:    true,
@@ -95,7 +89,7 @@ func configureLogging(config *Configuration) error {
 	return nil
 }
 
-func validateConfig(config *Configuration) (*Configuration, error) {
+func validateConfig(config *Config) (*Config, error) {
 	if config.API.Port == 0 && os.Getenv("PORT") != "" {
 		port, err := strconv.Atoi(os.Getenv("PORT"))
 		if err != nil {

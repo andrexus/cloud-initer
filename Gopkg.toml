@@ -8,6 +8,7 @@
 
 [[constraint]]
   name = "gopkg.in/go-playground/validator.v9"
+  version = "9.9.4"
 
 [[constraint]]
   name = "github.com/aymerick/raymond"
@@ -19,6 +20,7 @@
 
 [[constraint]]
   name = "github.com/xlab/closer"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/pkg/errors"
@@ -26,9 +28,11 @@
 
 [[constraint]]
   name = "github.com/spf13/cobra"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/spf13/viper"
+  version = "1.0.0"
 
 [[constraint]]
   name = "github.com/stretchr/testify"

@@ -19,7 +19,7 @@ var serveCmd = cobra.Command{
 	},
 }
 
-func serve(config *conf.Configuration) {
+func serve(config *conf.Config) {
 	db, err := conf.BoltConnect(config)
 	if err != nil {
 		logrus.Fatalf("Error opening database: %+v", err)

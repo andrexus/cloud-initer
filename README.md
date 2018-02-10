@@ -1,4 +1,7 @@
 # cloud-initer
+
+[![Build Status](https://travis-ci.org/andrexus/cloud-initer.svg?branch=master)](https://travis-ci.org/andrexus/cloud-initer)
+
 Manage and serve cloud-init’s meta-data and user-data.
 
 Download release binary or build it locally.

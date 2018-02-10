@@ -27,7 +27,7 @@ import (
 
 // API is the data holder for the API
 type API struct {
-	config *conf.Configuration
+	config *conf.Config
 	log    *logrus.Entry
 	db     *bolt.DB
 	echo   *echo.Echo
@@ -104,7 +104,7 @@ func (api *API) Stop() error {
 }
 
 // NewAPI will create an api instance that is ready to start
-func NewAPI(config *conf.Configuration, db *bolt.DB) *API {
+func NewAPI(config *conf.Config, db *bolt.DB) *API {
 	api := &API{
 		config: config,
 		log:    logrus.WithField("component", "api"),

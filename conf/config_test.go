@@ -10,7 +10,7 @@ import (
 )
 
 func TestConfigWithOverrides(t *testing.T) {
-	original := Configuration{}
+	original := Config{}
 	original.DB.Path = "db.bolt"
 	original.API.Host = "api-host"
 	original.API.Port = 8000
