@@ -68,6 +68,8 @@ func NewAPIResponseFromValidationError(errors validator.ValidationErrors) *APIRe
 			message = fmt.Sprintf("%s is required", err.Field())
 		case "json":
 			message = fmt.Sprintf("%s is not a valid JSON", err.Field())
+		case "yaml":
+			message = fmt.Sprintf("%s is not a valid YAML", err.Field())
 		case "ip":
 			message = fmt.Sprintf("%s is wrong", err.Field())
 		case "mac":

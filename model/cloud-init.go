@@ -3,8 +3,20 @@ package model
 import (
 	"errors"
 
+	"strings"
+
 	"github.com/aymerick/raymond"
 )
+
+func init() {
+	raymond.RegisterHelper("indent", func(s string, indent int) raymond.SafeString {
+		lines := strings.Split(s, "\n")
+		for i := 0; i < len(lines); i++ {
+			lines[i] = strings.Repeat(" ", indent) + lines[i]
+		}
+		return raymond.SafeString(strings.Join(lines, "\n"))
+	})
+}
 
 type CloudInitData struct {
 	UserData string `json:"userData"`
@@ -45,19 +57,22 @@ func (c *CloudInitServiceImpl) GetCloudInitDataForClient(ipAddress, userAgent st
 }
 
 func (c *CloudInitServiceImpl) newCloudInitDataFromTemplate(userDataTemplate, metaDataTemplate string) (*CloudInitData, error) {
-	config, err := c.EnvironmentService.GetEnvironmentConfig()
+	env, err := c.EnvironmentService.GetEnvironment()
+	if err != nil {
+		return nil, err
+	}
+	ctx, err := env.decodeConfig()
 	if err != nil {
 		return nil, err
 	}
 	cloudInitData := new(CloudInitData)
-
-	userData, err := renderTemplate(userDataTemplate, config)
+	userData, err := renderTemplate(userDataTemplate, ctx)
 	if err != nil {
 		return nil, err
 	}
 	cloudInitData.UserData = userData
 
-	metaData, err := renderTemplate(metaDataTemplate, config)
+	metaData, err := renderTemplate(metaDataTemplate, ctx)
 	if err != nil {
 		return nil, err
 	}
