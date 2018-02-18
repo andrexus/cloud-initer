@@ -13,12 +13,12 @@ const instanceKey = "request.instance"
 func (api *API) Preview(ctx echo.Context) error {
 	data := new(model.CloudInitData)
 	if err := ctx.Bind(data); err != nil {
-		response := &APIResponse{Message: err.Error()}
+		response := &MessageResponse{Message: err.Error()}
 		return ctx.JSON(http.StatusInternalServerError, response)
 	}
 	result, err := api.cloudInit.PreviewCloudInitData(data.UserData, data.MetaData)
 	if err != nil {
-		response := &APIResponse{Message: err.Error()}
+		response := &MessageResponse{Message: err.Error()}
 		return ctx.JSON(http.StatusInternalServerError, response)
 	}
 	return ctx.JSON(http.StatusOK, result)
@@ -40,7 +40,7 @@ func (api *API) injectInstanceByIp(next echo.HandlerFunc) echo.HandlerFunc {
 		ip := ctx.RealIP()
 		cloudInitData, e := api.cloudInit.GetCloudInitDataForClient(ip, ctx.Request().UserAgent())
 		if e != nil {
-			response := &APIResponse{Status: enums.Error, Message: e.Error()}
+			response := &MessageResponse{Status: enums.Error, Message: e.Error()}
 			return ctx.JSON(http.StatusInternalServerError, response)
 		}
 

@@ -12,7 +12,7 @@ func (api *API) EnvironmentGet(ctx echo.Context) error {
 	item, err := api.environment.GetEnvironment()
 
 	if err != nil {
-		response := &APIResponse{Message: err.Error()}
+		response := &MessageResponse{Message: err.Error()}
 		return ctx.JSON(http.StatusInternalServerError, response)
 	}
 	return ctx.JSON(http.StatusOK, item)
@@ -22,7 +22,7 @@ func (api *API) EnvironmentGet(ctx echo.Context) error {
 func (api *API) EnvironmentUpdate(ctx echo.Context) error {
 	item := new(model.Environment)
 	if err := ctx.Bind(item); err != nil {
-		response := &APIResponse{Message: err.Error()}
+		response := &MessageResponse{Message: err.Error()}
 		return ctx.JSON(http.StatusInternalServerError, response)
 	}
 	if err := ctx.Validate(item); err != nil {
@@ -30,7 +30,7 @@ func (api *API) EnvironmentUpdate(ctx echo.Context) error {
 	}
 	item, err := api.environment.Update(item)
 	if err != nil {
-		response := &APIResponse{Message: err.Error()}
+		response := &MessageResponse{Message: err.Error()}
 		return ctx.JSON(http.StatusInternalServerError, response)
 	}
 	return ctx.JSON(http.StatusOK, item)

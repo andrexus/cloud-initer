@@ -40,14 +40,14 @@ type API struct {
 	validator CustomValidator
 }
 
-type APIListResponse struct {
+type ListResponse struct {
 	Page     int         `json:"page"`
 	PageSize int         `json:"pageSize"`
 	Total    int         `json:"total"`
 	Items    interface{} `json:"items"`
 }
 
-type APIResponse struct {
+type MessageResponse struct {
 	Status  enums.APIResponseStatus `json:"status"`
 	Message string                  `json:"message"`
 	Errors  []ErrorResponseItem     `json:"errors,omitempty"`
@@ -58,7 +58,7 @@ type ErrorResponseItem struct {
 	Message string `json:"message"`
 }
 
-func NewAPIResponseFromValidationError(errors validator.ValidationErrors) *APIResponse {
+func NewAPIResponseFromValidationError(errors validator.ValidationErrors) *MessageResponse {
 	fieldErrors := []ErrorResponseItem{}
 	for _, err := range errors {
 		fieldName := err.Field()
@@ -80,7 +80,7 @@ func NewAPIResponseFromValidationError(errors validator.ValidationErrors) *APIRe
 		}
 		fieldErrors = append(fieldErrors, ErrorResponseItem{Field: err.Field(), Message: message})
 	}
-	response := &APIResponse{Status: enums.Error, Message: "Field validation error", Errors: fieldErrors}
+	response := &MessageResponse{Status: enums.Error, Message: "Field validation error", Errors: fieldErrors}
 	return response
 }
 
